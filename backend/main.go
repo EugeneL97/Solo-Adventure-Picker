@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/EugeneL97/solo-adventure-picker/src/routes"
+	"github.com/EugeneL97/solo-adventure-picker/routes"
 	"net/http"
 )
 
