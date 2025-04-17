@@ -1,11 +1,13 @@
 package routes
 
 import (
+	"context"
 	"encoding/json"
-	"math/rand/v2"
-	"net/http"
-
+	"github.com/EugeneL97/solo-adventure-picker/config"
 	"github.com/EugeneL97/solo-adventure-picker/models"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
+	"net/http"
 )
 
 func RegisterRoutes() {
@@ -17,21 +19,20 @@ func RegisterRoutes() {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Content-Type", "application/json")
 
-		seeds := []models.Adventure{
-			{Name: "El Corte de Madera Creek Preserve", Type: "hike"},
-			{Name: "Mount Tamalpais", Type: "hike"},
-			{Name: "Sunol Regional Wilderness", Type: "hike"},
-			{Name: "Windy Hill Open Space Preserve", Type: "hike"},
-			{Name: "Castle Rock State Park", Type: "hike"},
-			{Name: "Purisima Creek Redwoods", Type: "hike"},
-			{Name: "Lake Chabot Loop", Type: "hike"},
-			{Name: "Edgewood Park and Natural Preserve", Type: "hike"},
-			{Name: "Monte Bello Open Space Preserve", Type: "hike"},
-			{Name: "Big Basin Redwoods", Type: "hike"},
+		col := config.Client.Database("solo-adventure-picker").Collection("adventures")
+		pipe := mongo.Pipeline{{{"$sample", bson.D{{"size", 1}}}}}
+
+		cursor, err := col.Aggregate(context.Background(), pipe)
+		if err != nil || !cursor.Next(context.Background()) {
+			http.Error(w, "db error", 500)
+			return
 		}
 
-		random := seeds[rand.IntN(len(seeds))]
-		json.NewEncoder(w).Encode(random)
-
+		var adv models.Adventure
+		if err := cursor.Decode(&adv); err != nil {
+			http.Error(w, "decode error", 500)
+			return
+		}
+		json.NewEncoder(w).Encode(adv)
 	})
 }
