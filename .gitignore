@@ -24,3 +24,6 @@ go.work.sum
 
 # env file
 .env
+
+# Golang build log
+/backend/tmp/build-errors.log
