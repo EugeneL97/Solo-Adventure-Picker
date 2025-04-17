@@ -10,7 +10,7 @@ RUN go install github.com/air-verse/air@latest
 COPY go.mod .
 
 # Copy source code
-COPY src/ ./src/
+COPY . .
 
 # Use air instead of direct binary execution
 CMD ["air", "-c", ".air.toml"]
