@@ -7,6 +7,6 @@ import (
 
 func RegisterRoutes() {
 	http.HandleFunc("/ping", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprint(w, "pong")
+		fmt.Fprint(w, "pong!")
 	})
 }

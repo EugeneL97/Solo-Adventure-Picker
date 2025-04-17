@@ -2,9 +2,8 @@ package main
 
 import (
 	"fmt"
+	"github.com/EugeneL97/solo-adventure-picker/src/routes"
 	"net/http"
-
-	"github.com/EugeneL97/solo-adventure-picker/routes"
 )
 
 func main() {
