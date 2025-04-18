@@ -1,19 +1,31 @@
-version: "3.9"
 
 services:
-  frontend:
-    build: ./frontend
+  mongo:
+    image: mongo:7
     ports:
-      - "5173:5173"
+      - "27017:27017"
     volumes:
-      - ./frontend:/app
-      - /app/node_modules
+      - mongo-data:/data/db
+    restart: unless-stopped
+
+# TODO
+# Low priority
+# Seed and backend both download the same dependencies
+# Find a way to cache one set of dependencies and have the other rely on it
+
+  seed:
+    image: solo-adventure-picker-backend
+    command: go run scripts/seed.go
     environment:
-      - VITE_API_URL=http://localhost:8080
+      - MONGO_URI=mongodb://mongo:27017/solo
     depends_on:
-      - backend
+      - mongo
+    restart: "no"
+
   backend:
-    build: ./backend
+    build:
+      context: ./backend
+    image: solo-adventure-picker-backend
     ports:
       - "8080:8080"
     volumes:
@@ -22,12 +34,18 @@ services:
       - MONGO_URI=mongodb://mongo:27017/solo
     depends_on:
       - mongo
-  mongo:
-    image: mongo:7
+      - seed
+
+  frontend:
+    build: ./frontend
     ports:
-      - "27017:27017"
+      - "5173:5173"
     volumes:
-      - mongo-data:/data/db
-    restart: unless-stopped
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - vite_api_url=http://localhost:8080
+    depends_on:
+      - backend
 volumes:
   mongo-data:
