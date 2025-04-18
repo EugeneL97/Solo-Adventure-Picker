@@ -3,14 +3,27 @@ package main
 import (
 	"context"
 	"log"
+	"os"
 
 	"github.com/EugeneL97/solo-adventure-picker/config"
 	"github.com/EugeneL97/solo-adventure-picker/models"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 func main() {
-	config.InitDB("mongodb://localhost:27017")
+	config.InitDB(os.Getenv("MONGO_URI"))
 	col := config.Client.Database("solo-adventure-picker").Collection("adventures")
+
+	n, err := col.CountDocuments(context.Background(), bson.D{})
+	if err != nil {
+		log.Println("Seed count error: ", err)
+		return
+	}
+
+	if n > 0 {
+		log.Printf("Adventures already seeded: %d\n", n)
+		return
+	}
 
 	seed := []interface{}{
 		models.Adventure{Name: "El Corte de Madera Creek Preserve", Type: "hike"},
@@ -27,5 +40,5 @@ func main() {
 	if _, err := col.InsertMany(context.Background(), seed); err != nil {
 		log.Fatal(err)
 	}
-	log.Println("Seed inserted!")
+	log.Printf("Seed inserted with %d adventures!\n", len(seed))
 }
