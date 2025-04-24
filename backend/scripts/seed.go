@@ -8,7 +8,6 @@ import (
 
 	"github.com/EugeneL97/solo-adventure-picker/config"
 	"github.com/EugeneL97/solo-adventure-picker/models"
-	"go.mongodb.org/mongo-driver/bson"
 )
 
 func main() {
