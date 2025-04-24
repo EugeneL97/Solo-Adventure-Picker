@@ -27,10 +27,13 @@ const getRandomAdventure = async () => {
   const region = route.query.region || ''
   try {
     const res = await fetch(`http://localhost:8080/random?region=${region}`)
+
+    if (!res.ok) {
+      const errorJson = await res.json()
+      throw new Error(errorJson.details || errorJson.error || 'Something went wrong')
+    }
+
     const data = await res.json()
-
-    if (!res.ok) throw new Error(data.error || 'Something went wrong')
-
     adventure.value = data
     errorMsg.value = ''
   } catch (err) {
