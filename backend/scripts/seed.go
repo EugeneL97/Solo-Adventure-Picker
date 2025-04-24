@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"go.mongodb.org/mongo-driver/bson"
 	"log"
 	"os"
 
@@ -26,16 +27,16 @@ func main() {
 	}
 
 	seed := []interface{}{
-		models.Adventure{Name: "El Corte de Madera Creek Preserve", Type: "hike"},
-		models.Adventure{Name: "Mount Tamalpais", Type: "hike"},
-		models.Adventure{Name: "Sunol Regional Wilderness", Type: "hike"},
-		models.Adventure{Name: "Windy Hill Open Space Preserve", Type: "hike"},
-		models.Adventure{Name: "Castle Rock State Park", Type: "hike"},
-		models.Adventure{Name: "Purisima Creek Redwoods", Type: "hike"},
-		models.Adventure{Name: "Lake Chabot Loop", Type: "hike"},
-		models.Adventure{Name: "Edgewood Park and Natural Preserve", Type: "hike"},
-		models.Adventure{Name: "Monte Bello Open Space Preserve", Type: "hike"},
-		models.Adventure{Name: "Big Basin Redwoods", Type: "hike"},
+		models.Adventure{Name: "El Corte de Madera Creek Preserve", Type: "hike", Region: "bay-area"},
+		models.Adventure{Name: "Mount Tamalpais", Type: "hike", Region: "bay-area"},
+		models.Adventure{Name: "Sunol Regional Wilderness", Type: "hike", Region: "bay-area"},
+		models.Adventure{Name: "Windy Hill Open Space Preserve", Type: "hike", Region: "bay-area"},
+		models.Adventure{Name: "Castle Rock State Park", Type: "hike", Region: "bay-area"},
+		models.Adventure{Name: "Purisima Creek Redwoods", Type: "hike", Region: "bay-area"},
+		models.Adventure{Name: "Lake Chabot Loop", Type: "hike", Region: "bay-area"},
+		models.Adventure{Name: "Edgewood Park and Natural Preserve", Type: "hike", Region: "bay-area"},
+		models.Adventure{Name: "Monte Bello Open Space Preserve", Type: "hike", Region: "bay-area"},
+		models.Adventure{Name: "Big Basin Redwoods", Type: "hike", Region: "bay-area"},
 	}
 	if _, err := col.InsertMany(context.Background(), seed); err != nil {
 		log.Fatal(err)
