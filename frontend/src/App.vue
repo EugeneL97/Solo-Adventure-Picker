@@ -1,21 +1,17 @@
 <template>
   <div id="app">
-    <h1>Solo Adventure Picker</h1>
-    <button @click="getRandomAdventure">Pick an Adventure</button>
-    <div v-if="adventure" class="card">
-      <h2>{{ adventure }}</h2>
-    </div>
+    <transition name="fade" mode="out-in">
+      <router-view />
+    </transition>
   </div>
 </template>
 
-<script setup>
-import { ref } from 'vue'
-
-const adventure = ref('')
-
-const getRandomAdventure = async () => {
-  const res = await fetch('http://localhost:8080/random')
-  const data = await res.json()
-  adventure.value = data.Name
+<style>
+/* Optional global fade animation */
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.4s ease;
 }
-</script>
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
+}
+</style>
