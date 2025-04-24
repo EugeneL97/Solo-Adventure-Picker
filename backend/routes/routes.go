@@ -11,9 +11,6 @@ import (
 )
 
 func RegisterRoutes() {
-	http.HandleFunc("/ping", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("pong!"))
-	})
 
 	http.HandleFunc("/random", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -22,18 +19,29 @@ func RegisterRoutes() {
 
 		w.Header().Set("Content-Type", "application/json")
 
+		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusNoContent)
+			return
+		}
+		region := r.URL.Query().Get("region")
 		col := config.Client.Database("solo-adventure-picker").Collection("adventures")
-		pipe := mongo.Pipeline{{{"$sample", bson.D{{"size", 1}}}}}
 
-		cursor, err := col.Aggregate(context.Background(), pipe)
+		pipeline := mongo.Pipeline{}
+
+		if region != "" {
+			pipeline = append(pipeline, bson.D{{"$match", bson.D{{"region", region}}}})
+		}
+		pipeline = append(pipeline, bson.D{{"$sample", bson.D{{"size", 1}}}})
+
+		cursor, err := col.Aggregate(context.Background(), pipeline)
 		if err != nil || !cursor.Next(context.Background()) {
-			http.Error(w, "db error", 500)
+			http.Error(w, "No matching adventure found.", http.StatusNotFound)
 			return
 		}
 
 		var adv models.Adventure
 		if err := cursor.Decode(&adv); err != nil {
-			http.Error(w, "decode error", 500)
+			http.Error(w, "Error decoding adventure.", http.StatusInternalServerError)
 			return
 		}
 		json.NewEncoder(w).Encode(adv)
