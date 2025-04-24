@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"github.com/EugeneL97/solo-adventure-picker/config"
 	"github.com/EugeneL97/solo-adventure-picker/models"
+	"github.com/EugeneL97/solo-adventure-picker/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"net/http"
@@ -35,13 +36,20 @@ func RegisterRoutes() {
 
 		cursor, err := col.Aggregate(context.Background(), pipeline)
 		if err != nil || !cursor.Next(context.Background()) {
-			http.Error(w, "No matching adventure found.", http.StatusNotFound)
+			utils.WriteJSONError(w, http.StatusNotFound, utils.APIError{
+				Error:   "No matching adventure found.",
+				Code:    1001,
+				Details: "Region either has no adventures or the database is down. Womp womp."})
 			return
 		}
 
 		var adv models.Adventure
 		if err := cursor.Decode(&adv); err != nil {
-			http.Error(w, "Error decoding adventure.", http.StatusInternalServerError)
+			utils.WriteJSONError(w, http.StatusInternalServerError, utils.APIError{
+				Error:   "Error decoding adventure.",
+				Code:    1002,
+				Details: "You fed me improperly formatted JSON data. I hate you.",
+			})
 			return
 		}
 		json.NewEncoder(w).Encode(adv)
