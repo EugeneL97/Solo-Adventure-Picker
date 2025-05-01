@@ -4,7 +4,7 @@
 
     <div v-if="adventure" class="card">
       <h2>{{ displayName }}</h2>
-      <h2>{{ displayType }}</h2>
+      <h3>{{ displayType }}</h3>
       <!-- <p v-if="adventure.tags?.length">Tags: {{ adventure.tags.join(', ') }}</p> -->
     </div>
 
@@ -49,13 +49,23 @@ const displayType = computed(() => capitalizeWords(adventure.value?.type))
 </script>
 
 <style scoped>
+.card h2, .card h3 {
+  margin: 0.5rem 0;
+  color: #213547;
+}
+
+button {
+  margin-top: 2rem;
+}
 .error {
   color: red;
   margin-top: 1rem;
 }
 .card {
-  border: 1px solid #ccc;
-  padding: 1rem;
-  margin-top: 1rem;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  padding: 2rem;
+  margin-top: 2rem;
 }
 </style>
