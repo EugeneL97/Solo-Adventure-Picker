@@ -14,8 +14,8 @@ This roadmap outlines the development phases for turning the app into a gamified
 ---
 
 ##  Phase 1 – MVP Loop
-- [ ] Design and apply animated card transition when rerolling
-- [ ] Display XP value for adventure types
+- [x] Design and apply animated card transition when rerolling
+- [x] Display XP value for adventure types
 - [ ] Implement XP counter per user (mock data first)
 - [ ] Create journal input box (with basic validation)
 - [ ] Award bonus XP on journal submission
