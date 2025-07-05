@@ -3,12 +3,15 @@ package routes
 import (
 	"context"
 	"encoding/json"
+	"log"
+	"net/http"
+
 	"github.com/EugeneL97/solo-adventure-picker/config"
 	"github.com/EugeneL97/solo-adventure-picker/models"
+	"github.com/EugeneL97/solo-adventure-picker/services"
 	"github.com/EugeneL97/solo-adventure-picker/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
-	"net/http"
 )
 
 func RegisterRoutes() {
@@ -52,6 +55,65 @@ func RegisterRoutes() {
 			})
 			return
 		}
+
+		// AI Enhancement: Create a basic user profile and enhance the adventure
+		enhanceWithAI(&adv)
+
 		json.NewEncoder(w).Encode(adv)
 	})
+}
+
+// enhanceWithAI uses the adventure agent to personalize the adventure description
+func enhanceWithAI(adv *models.Adventure) {
+	ctx := context.Background()
+	agent, err := services.NewAdventureAgent(ctx)
+	if err != nil {
+		log.Printf("Failed to create adventure agent: %v", err)
+		// Set a default description if AI isn't available
+		if adv.Description == "" {
+			adv.Description = "Embark on this exciting adventure!"
+		}
+		// Set default XP value
+		if adv.XPValue == 0 {
+			adv.XPValue = 100
+		}
+		return
+	}
+	defer agent.Close()
+
+	// Create a default user profile for now (later you'll get this from user data)
+	userProfile := &services.UserProfile{
+		Preferences: []string{"outdoor activities", "exploration", "mindfulness"},
+		PastTypes:   []string{},
+		EnergyLevel: "medium",
+	}
+
+	// Generate a basic description if none exists
+	basicDescription := adv.Description
+	if basicDescription == "" {
+		basicDescription = "A wonderful adventure awaits you!"
+	}
+
+	// Enhance the description with AI
+	enhanced, err := agent.EnhanceDescription(adv.Name, adv.Type, basicDescription, userProfile)
+	if err != nil {
+		log.Printf("Failed to enhance adventure description: %v", err)
+		adv.Description = basicDescription
+	} else {
+		adv.Description = enhanced
+	}
+
+	// Set XP value based on adventure type (you can make this more sophisticated later)
+	if adv.XPValue == 0 {
+		switch adv.Type {
+		case "hike", "outdoor":
+			adv.XPValue = 150
+		case "food", "cafe":
+			adv.XPValue = 75
+		case "culture", "museum":
+			adv.XPValue = 125
+		default:
+			adv.XPValue = 100
+		}
+	}
 }

@@ -3,23 +3,19 @@ import { useSearchParams } from 'react-router-dom'
 import { capitalizeWords } from '../utils/formatting.js'
 import './AdventurePage.css'
 
-const COOLDOWN_DURATION = 2000 // 2 seconds cooldown
-
 function AdventurePage() {
   const [searchParams] = useSearchParams()
   const [adventure, setAdventure] = useState(null)
   const [errorMsg, setErrorMsg] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
-  const [isInCooldown, setIsInCooldown] = useState(false)
 
   const region = searchParams.get('region') || ''
 
   const buttonText = useMemo(() => {
     if (isLoading) return 'Finding Adventure...'
-    if (isInCooldown) return 'Wait a moment...'
     return 'Pick Another Adventure'
-  }, [isLoading, isInCooldown])
+  }, [isLoading])
 
   const displayName = useMemo(() => 
     capitalizeWords(adventure?.name), [adventure?.name]
@@ -29,15 +25,8 @@ function AdventurePage() {
     capitalizeWords(adventure?.type), [adventure?.type]
   )
 
-  const startCooldown = () => {
-    setIsInCooldown(true)
-    setTimeout(() => {
-      setIsInCooldown(false)
-    }, COOLDOWN_DURATION)
-  }
-
   const getRandomAdventure = async () => {
-    if (isInCooldown || isLoading) return
+    if (isLoading) return
     
     setIsLoading(true)
     setIsExpanded(false)
@@ -58,7 +47,6 @@ function AdventurePage() {
       setErrorMsg(err.message)
     } finally {
       setIsLoading(false)
-      startCooldown()
     }
   }
 
@@ -108,9 +96,9 @@ function AdventurePage() {
 
       <div className="reroll-btn-wrapper">
         <button 
-          className={`reroll-btn ${isInCooldown ? 'in-cooldown' : ''}`}
+          className="reroll-btn"
           onClick={getRandomAdventure} 
-          disabled={isLoading || isInCooldown}
+          disabled={isLoading}
         >
           {buttonText}
         </button>
