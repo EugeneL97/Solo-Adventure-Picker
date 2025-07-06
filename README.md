@@ -10,7 +10,7 @@ A journaling and adventure app for solo explorers who tend to overthink their fr
 - Solo-first design, expandable to date or group modes
 
 ## Tech Stack
-Vue/Go/MongoDB
+React/Go/MongoDB
 
 ## Why It Exists
 Built by someone who overplans everything and eventually gets too overwhelmed to go through with it.
